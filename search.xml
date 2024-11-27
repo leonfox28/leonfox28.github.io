@@ -94,4 +94,45 @@
         <tag>eda</tag>
       </tags>
   </entry>
+  <entry>
+    <title>常用链接</title>
+    <url>/2024/11/27/%E5%B8%B8%E7%94%A8%E9%93%BE%E6%8E%A5/</url>
+    <content><![CDATA[<h1 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h1><table>
+<thead>
+<tr>
+<th>Revision</th>
+<th>Description</th>
+<th>Author</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Initial release.</td>
+<td>Leon</td>
+<td>2024-11-27</td>
+</tr>
+</tbody></table>
+<h1 id="Keysight"><a href="#Keysight" class="headerlink" title="Keysight"></a>Keysight</h1><ul>
+<li><a href="https://www.keysight.com.cn/cn/zh/lib/software-detail/computer-software/pathwave-advanced-design-system-ads-software-2212036.html">Advanced Design System (ADS)</a></li>
+<li><a href="https://www.keysight.com/us/en/lib/resources/technical-specifications/latest-versions-signal-studio-software-2806906.html">Signal Studio Software</a></li>
+</ul>
+<h1 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h1><ul>
+<li><a href="https://massgrave.dev/">Microsoft Activation Scripts (MAS)</a></li>
+<li><a href="https://wind4.github.io/vlmcsd/">Microsoft KMS Activation</a></li>
+<li><a href="https://files.rg-adguard.net/search">List of files by Microsoft®</a></li>
+</ul>
+<h1 id="VMware"><a href="#VMware" class="headerlink" title="VMware"></a>VMware</h1><ul>
+<li><a href="https://www.dinghui.org/">丁辉博客</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>eda</tag>
+        <tag>ads</tag>
+        <tag>cadence</tag>
+        <tag>virtuoso</tag>
+        <tag>windows</tag>
+        <tag>keysight</tag>
+      </tags>
+  </entry>
 </search>
