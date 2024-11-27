@@ -1,6 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>EDA环境搭建（零）：架构与硬件选型</title>
+    <url>/2024/11/26/EDA%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88%E9%9B%B6%EF%BC%89%EF%BC%9A%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A1%AC%E4%BB%B6%E9%80%89%E5%9E%8B/</url>
+    <content><![CDATA[<blockquote>
+<p>公司要新建一套 EDA 环境，要满足易用、安全的原则。</p>
+</blockquote>
+<span id="more"></span>
+<h1 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h1><table>
+<thead>
+<tr>
+<th>Revision</th>
+<th>Description</th>
+<th>Author</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Initial release.</td>
+<td>Leon</td>
+<td>2024-11-26</td>
+</tr>
+</tbody></table>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><ul>
+<li>公司目前的 EDA 环境为很多人登录在一台 Windows Server 上，数据也存在本地，虽然是 RAID 1 的配置，但依然不放心。另外这种方式不方便进行计算资源的管理，且项目中的多人合作也因没有版本控制而饱受诟病。</li>
+<li>因此计划更新整套 EDA 环境，期望解决以上问题。</li>
+</ul>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><ul>
+<li>大致架构如下：<br>  <img src="https://s2.loli.net/2024/11/27/gd4oribI7QFhGNW.png" alt="image.png"></li>
+</ul>
+<h1 id="软件"><a href="#软件" class="headerlink" title="软件"></a>软件</h1><ul>
+<li>主要使用到的软件有：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">虚拟化：VMware vSphere ESXi 8.0u3b</span><br><span class="line">集群管理：VMware vCenter Server 8.0.3</span><br><span class="line">VDI：VMware Horizon 8 2312.1</span><br><span class="line">Linux 虚拟机：RHEL 8.8</span><br><span class="line">Windows 虚拟机：Windows 10 LTSC</span><br><span class="line">计算服务器：RHEL 8.8</span><br><span class="line">ADS: ADS 2024 U2.2</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="硬件"><a href="#硬件" class="headerlink" title="硬件"></a>硬件</h1><h2 id="虚拟化服务器"><a href="#虚拟化服务器" class="headerlink" title="虚拟化服务器"></a>虚拟化服务器</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R283-ZK0</span><br><span class="line">CPU：EPYC 9554 x2</span><br><span class="line">内存：三星64G DDR5 4800 x8</span><br><span class="line">硬盘：SN640 7.68T x2</span><br><span class="line">显卡：Tesla T4 x2</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
+
+<h2 id="计算服务器"><a href="#计算服务器" class="headerlink" title="计算服务器"></a>计算服务器</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R283-ZK0</span><br><span class="line">CPU：EPYC 9554 x2</span><br><span class="line">内存：三星64G DDR5 4800 x16</span><br><span class="line">硬盘：SN640 7.68T x2</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
+
+<h1 id="L1-存储服务器"><a href="#L1-存储服务器" class="headerlink" title="L1 存储服务器"></a>L1 存储服务器</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R272-Z34</span><br><span class="line">CPU：EPYC 7543</span><br><span class="line">内存：三星64G DDR4 3200 x4</span><br><span class="line">硬盘：SN640 7.68T x8</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
+
+<h1 id="L2-存储服务器"><a href="#L2-存储服务器" class="headerlink" title="L2 存储服务器"></a>L2 存储服务器</h1><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R272-Z34</span><br><span class="line">CPU：EPYC 7543</span><br><span class="line">内存：三星64G DDR4 3200 x4</span><br><span class="line">硬盘：希捷 16T x12</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
+
+<h2 id="Firewall"><a href="#Firewall" class="headerlink" title="Firewall"></a>Firewall</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">飞塔 FG-90G</span><br></pre></td></tr></table></figure>
+
+<h2 id="Switch"><a href="#Switch" class="headerlink" title="Switch"></a>Switch</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Mikrotik CRS510-8XS-2XQ-IN</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>EDA环境搭建</category>
+      </categories>
+      <tags>
+        <tag>eda</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>EDA环境搭建（一）：安装VMware vSphere 8.0</title>
     <url>/2024/11/26/EDA%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%AE%89%E8%A3%85%20VMware%20vSphere%208.0/</url>
     <content><![CDATA[<blockquote>
@@ -41,47 +92,6 @@
       <tags>
         <tag>eda</tag>
         <tag>vsphere</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>EDA环境搭建（零）：架构与硬件选型</title>
-    <url>/2024/11/26/EDA%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88%E9%9B%B6%EF%BC%89%EF%BC%9A%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A1%AC%E4%BB%B6%E9%80%89%E5%9E%8B/</url>
-    <content><![CDATA[<blockquote>
-<p>公司要新建一套 EDA 环境，要满足易用、安全的原则。</p>
-</blockquote>
-<span id="more"></span>
-<h1 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h1><table>
-<thead>
-<tr>
-<th>Revision</th>
-<th>Description</th>
-<th>Author</th>
-<th>Date</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>Initial release.</td>
-<td>Leon</td>
-<td>2024-11-26</td>
-</tr>
-</tbody></table>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><ul>
-<li>公司目前的 EDA 环境为很多人登录在一台 Windows Server 上，数据也存在本地，虽然是 RAID 1 的配置，但依然不放心。另外这种方式不方便进行计算资源的管理，且项目中的多人合作也因没有版本控制而饱受诟病。</li>
-<li>因此计划更新整套 EDA 环境，期望解决以上问题。</li>
-</ul>
-<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><ul>
-<li>大致架构如下：</li>
-</ul>
-<h1 id="软件"><a href="#软件" class="headerlink" title="软件"></a>软件</h1><ul>
-<li>主要使用到的软件有：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">虚拟化：VMware vSphere ESXi 8.0u3b</span><br><span class="line">集群管理：VMware vCenter Server 8.0.3</span><br><span class="line">VDI：VMware Horizon 8 2312.1</span><br><span class="line">Linux 虚拟机：RHEL 8.8</span><br><span class="line">Windows 虚拟机：Windows 10 LTSC</span><br><span class="line">计算服务器：RHEL 8.8</span><br></pre></td></tr></table></figure></li>
-</ul>
-]]></content>
-      <categories>
-        <category>EDA环境搭建</category>
-      </categories>
-      <tags>
-        <tag>eda</tag>
       </tags>
   </entry>
 </search>
