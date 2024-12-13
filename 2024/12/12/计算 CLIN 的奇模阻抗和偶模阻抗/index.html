@@ -19,28 +19,28 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"leonfox28.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.21.1","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Changelog   Revision Description Author Date    1 Initial release. Leon 2024-12-12   目的 原理图设计阶段，为了设计方便，常使用带奇模&#x2F;偶模阻抗及电长度的理想 CLIN 模型进行设计； 但在 layout 阶段，我们很难直观的看到一对 CLIN 的奇模&#x2F;偶模阻抗，需要根据仿真结果进行计算； 本文">
+    <meta name="description" content="介绍如何计算 CLIN 的奇模和偶模阻抗">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Leon 的博客">
-<meta property="og:url" content="https://leonfox28.github.io/2024/12/13/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/index.html">
+<meta property="og:title" content="计算 CLIN 的奇模阻抗和偶模阻抗">
+<meta property="og:url" content="https://leonfox28.github.io/2024/12/12/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/index.html">
 <meta property="og:site_name" content="Leon 的博客">
-<meta property="og:description" content="Changelog   Revision Description Author Date    1 Initial release. Leon 2024-12-12   目的 原理图设计阶段，为了设计方便，常使用带奇模&#x2F;偶模阻抗及电长度的理想 CLIN 模型进行设计； 但在 layout 阶段，我们很难直观的看到一对 CLIN 的奇模&#x2F;偶模阻抗，需要根据仿真结果进行计算； 本文">
+<meta property="og:description" content="介绍如何计算 CLIN 的奇模和偶模阻抗">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-12-13T03:00:35.490Z">
-<meta property="article:modified_time" content="2024-12-13T03:02:34.445Z">
+<meta property="article:published_time" content="2024-12-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-12-11T16:00:00.000Z">
 <meta property="article:author" content="Leon Hu">
 <meta property="article:tag" content="ads">
 <meta property="article:tag" content="design">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://leonfox28.github.io/2024/12/13/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/">
+<link rel="canonical" href="https://leonfox28.github.io/2024/12/12/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://leonfox28.github.io/2024/12/13/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/","path":"2024/12/13/计算 CLIN 的奇模阻抗和偶模阻抗/","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://leonfox28.github.io/2024/12/12/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/","path":"2024/12/12/计算 CLIN 的奇模阻抗和偶模阻抗/","title":"计算 CLIN 的奇模阻抗和偶模阻抗"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title> | Leon 的博客</title>
+<title>计算 CLIN 的奇模阻抗和偶模阻抗 | Leon 的博客</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-73JE1VF816"></script>
   <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-73JE1VF816","only_pageview":false,"measure_protocol_api_secret":null}</script>
@@ -144,7 +144,8 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Changelog"><span class="nav-number">1.</span> <span class="nav-text">Changelog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E7%9A%84"><span class="nav-number">2.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">3.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E4%B8%80%E5%AF%B9-CLIN-%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97"><span class="nav-number">4.</span> <span class="nav-text">计算一对 CLIN 的奇模阻抗和偶模阻抗</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#changelog"><span class="nav-number">1.</span> <span class="nav-text">Changelog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E7%9A%84"><span class="nav-number">2.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">3.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E4%B8%80%E5%AF%B9-clin-%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97"><span class="nav-number">4.</span> <span class="nav-text">计算一对 CLIN
+的奇模阻抗和偶模阻抗</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -163,7 +164,7 @@
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -203,7 +204,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://leonfox28.github.io/2024/12/13/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/">
+    <link itemprop="mainEntityOfPage" href="https://leonfox28.github.io/2024/12/12/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -216,12 +217,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Leon 的博客">
+      <meta itemprop="name" content="计算 CLIN 的奇模阻抗和偶模阻抗 | Leon 的博客">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
+          计算 CLIN 的奇模阻抗和偶模阻抗
         </h1>
 
         <div class="post-meta-container">
@@ -231,9 +232,17 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2024-12-13 11:00:35 / 修改时间：11:02:34" itemprop="dateCreated datePublished" datetime="2024-12-13T11:00:35+08:00">2024-12-13</time>
+      <time title="创建时间：2024-12-12 00:00:00" itemprop="dateCreated datePublished" datetime="2024-12-12T00:00:00+08:00">2024-12-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%94%B5%E8%B7%AF%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">电路设计</span></a>
+        </span>
     </span>
 
   
@@ -245,7 +254,12 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h1><table>
+    <div class="post-body" itemprop="articleBody"><blockquote>
+<p>介绍如何计算 CLIN 的奇模和偶模阻抗</p>
+</blockquote>
+<span id="more"></span>
+<h1 id="changelog">Changelog</h1>
+<table>
 <thead>
 <tr>
 <th>Revision</th>
@@ -254,75 +268,111 @@
 <th>Date</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>1</td>
 <td>Initial release.</td>
 <td>Leon</td>
 <td>2024-12-12</td>
 </tr>
-</tbody></table>
-<h1 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h1><ul>
-<li>原理图设计阶段，为了设计方便，常使用带奇模&#x2F;偶模阻抗及电长度的理想 CLIN 模型进行设计；</li>
-<li>但在 layout 阶段，我们很难直观的看到一对 CLIN 的奇模&#x2F;偶模阻抗，需要根据仿真结果进行计算；</li>
+</tbody>
+</table>
+<h1 id="目的">目的</h1>
+<ul>
+<li>原理图设计阶段，为了设计方便，常使用带奇模/偶模阻抗及电长度的理想
+CLIN 模型进行设计；</li>
+<li>但在 layout 阶段，我们很难直观的看到一对 CLIN
+的奇模/偶模阻抗，需要根据仿真结果进行计算；</li>
 <li>本文即介绍如何计算一对 CLIN 的奇模阻抗和偶模阻抗。</li>
 </ul>
-<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><ol>
-<li>奇模、奇模阻抗与差分阻抗<ul>
-<li>奇模（Odd Mode）: 当差分线对上的两个信号幅度相等、相位相反时，我们称之为奇模。例如，一条线上的电压为+V，另一条线上的电压为-V。奇模信号主要对应差分信号；</li>
-<li>奇模阻抗（Odd-Mode Impedence, $Z_{odd}$）是指当差分线对以奇模方式激励时，单根传输线的特性阻抗。换句话说，它是差分信号在单根线上看到的阻抗。<ul>
-<li>对于紧密耦合的差分线对，&#x3D;&#x3D;奇模阻抗会比单根传输线的特性阻抗低&#x3D;&#x3D;。这是因为两条线之间的耦合导致了电容的增加。</li>
-</ul>
-</li>
-<li>差分阻抗（$Z_{diff}$）是差分信号在差分线对上传输时所看到的阻抗。在理想情况下，差分阻抗是奇模阻抗的两倍：$Z_{diff} &#x3D; 2 \times Z_{odd}$；</li>
-</ul>
-</li>
-<li>偶模、偶模阻抗与共模阻抗<ul>
-<li>偶模（Even Mode）: 当差分线对上的两个信号幅度相等、相位相同时，我们称之为偶模。例如，两条线上的电压都为+V。偶模信号主要对应共模信号；</li>
-<li>偶模阻抗（Even-Mode Impedance, $Z_{even}$）是指当差分线对以偶模方式激励时，单根传输线的特性阻抗。换句话说，它是共模信号在单根线上看到的阻抗；<ul>
-<li>对于紧密耦合的差分线对，&#x3D;&#x3D;偶模阻抗会比单根传输线的特性阻抗高&#x3D;&#x3D;。这是因为两条线之间的耦合导致了电感的增加。</li>
-</ul>
-</li>
-<li>共模阻抗（$Z_{common}$）是共模信号在差分线对上传输时所看到的阻抗。在理想情况下，共模阻抗是偶模阻抗的一半：$Z_{common} &#x3D; Z_{even} \div 2$</li>
-</ul>
-</li>
+<h1 id="基本概念">基本概念</h1>
+<ol type="1">
+<li>奇模、奇模阻抗与差分阻抗
+<ul>
+<li>奇模（Odd Mode）:
+当差分线对上的两个信号幅度相等、相位相反时，我们称之为奇模。例如，一条线上的电压为+V，另一条线上的电压为-V。奇模信号主要对应差分信号；</li>
+<li>奇模阻抗（Odd-Mode Impedence, <span
+class="math inline">\(Z_{odd}\)</span>）是指当差分线对以奇模方式激励时，单根传输线的特性阻抗。换句话说，它是差分信号在单根线上看到的阻抗。
+<ul>
+<li>对于紧密耦合的差分线对，==奇模阻抗会比单根传输线的特性阻抗低==。这是因为两条线之间的耦合导致了电容的增加。</li>
+</ul></li>
+<li>差分阻抗（<span
+class="math inline">\(Z_{diff}\)</span>）是差分信号在差分线对上传输时所看到的阻抗。在理想情况下，差分阻抗是奇模阻抗的两倍：<span
+class="math inline">\(Z_{diff} = 2 \times Z_{odd}\)</span>；</li>
+</ul></li>
+<li>偶模、偶模阻抗与共模阻抗
+<ul>
+<li>偶模（Even Mode）:
+当差分线对上的两个信号幅度相等、相位相同时，我们称之为偶模。例如，两条线上的电压都为+V。偶模信号主要对应共模信号；</li>
+<li>偶模阻抗（Even-Mode Impedance, <span
+class="math inline">\(Z_{even}\)</span>）是指当差分线对以偶模方式激励时，单根传输线的特性阻抗。换句话说，它是共模信号在单根线上看到的阻抗；
+<ul>
+<li>对于紧密耦合的差分线对，==偶模阻抗会比单根传输线的特性阻抗高==。这是因为两条线之间的耦合导致了电感的增加。</li>
+</ul></li>
+<li>共模阻抗（<span
+class="math inline">\(Z_{common}\)</span>）是共模信号在差分线对上传输时所看到的阻抗。在理想情况下，共模阻抗是偶模阻抗的一半：<span
+class="math inline">\(Z_{common} = Z_{even} \div 2\)</span></li>
+</ul></li>
 </ol>
-<h1 id="计算一对-CLIN-的奇模阻抗和偶模阻抗"><a href="#计算一对-CLIN-的奇模阻抗和偶模阻抗" class="headerlink" title="计算一对 CLIN 的奇模阻抗和偶模阻抗"></a>计算一对 CLIN 的奇模阻抗和偶模阻抗</h1><ol>
-<li>画出一对 CLIN：<ol>
-<li>使用如下叠层结构：<ul>
+<h1 id="计算一对-clin-的奇模阻抗和偶模阻抗">计算一对 CLIN
+的奇模阻抗和偶模阻抗</h1>
+<ol type="1">
+<li>画出一对 CLIN：
+<ol type="1">
+<li>使用如下叠层结构：
+<ul>
 <li>10L 板；</li>
 <li>铜厚 15um，从上到下为 M1~M10；</li>
 <li>介质层为 GEA-705G，介电常数为 3.7，厚度为 25um；</li>
-</ul>
-</li>
-<li>CLIN：<ul>
+</ul></li>
+<li>CLIN：
+<ul>
 <li>位于 M1，边缘耦合，线宽 40um，线距 20um，长度 1500um；</li>
-</ul>
-</li>
-</ol>
-</li>
+</ul></li>
+</ol></li>
 <li>使用 Mom RF 进行仿真并生成模型；</li>
-<li>在 schematic 中导入模型，使用 AC (<em>I_AC</em>) 源进行激励，波形为 $I_{ac} &#x3D; polar(1,0) A$，频率参数化为 $freq$，并添加 AC 仿真器：<ol>
-<li>计算奇模阻抗：<ol>
-<li>使用奇模方式连接 AC 源对 CLIN 进行开路激励，使用 label 获得 AC 源正负极电压为 $V_{diffoch}$ 与 $V_{diffocl}$；</li>
-<li>使用奇模方式连接 AC 源对 CLIN 进行短路激励，使用 label 获得 AC 源正负极电压为 $V_{diffsch}$ 与 $V_{diffscl}$；</li>
-<li>即可得到 $Z_{odd}$：$$\begin{align}Z_{diff} &amp;&#x3D; V_{diffoch} - V_{diffocl} \Z_{diffsc} &amp;&#x3D; V_{diffsch} - V_{diffscl} \Z_{diff} &amp;&#x3D; \sqrt{Z_{diffoc} \times  Z_{diffsc}} \Z_{odd} &amp;&#x3D; Z_{diff} \div 2 \\end{align}$$</li>
-</ol>
-</li>
-<li>计算偶模阻抗：<ol>
-<li>使用偶模方式连接 AC 源对 CLIN 进行开路激励，使用 label 获得 AC 源的输出电压为 $V_{cmoc}$ ；</li>
-<li>使用偶模方式连接 AC 源对 CLIN 进行短路激励，CLIN 的另一端接地，使用 label 获得 AC 源的输出电压为 $V_{cmsc}$ ；</li>
-<li>即可得到 $Z_{even}$：$$\begin{align}Z_{cm} &amp;&#x3D; \sqrt{V_{cmoc} \times V_{cmsc}} \Z_{even} &amp;&#x3D; Z_{cm} \times 2 \\end{align}$$</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>验证：<ol>
-<li>使用 ADS 自带的理想 CLIN 模型，将上一步得到的奇模阻抗、偶模阻抗以及电长度带入，计算 S 参数，可以看到两种方式的结果非常接近。</li>
-</ol>
-</li>
+<li>在 schematic 中导入模型，使用 AC (<em>I_AC</em>) 源进行激励，波形为
+<span class="math inline">\(I_{ac} = polar(1,0) A\)</span>，频率参数化为
+<span class="math inline">\(freq\)</span>，并添加 AC 仿真器：
+<ol type="1">
+<li>计算奇模阻抗：
+<ol type="1">
+<li>使用奇模方式连接 AC 源对 CLIN 进行开路激励，使用 label 获得 AC
+源正负极电压为 <span class="math inline">\(V_{diffoch}\)</span> 与 <span
+class="math inline">\(V_{diffocl}\)</span>；</li>
+<li>使用奇模方式连接 AC 源对 CLIN 进行短路激励，使用 label 获得 AC
+源正负极电压为 <span class="math inline">\(V_{diffsch}\)</span> 与 <span
+class="math inline">\(V_{diffscl}\)</span>；</li>
+<li>即可得到 <span class="math inline">\(Z_{odd}\)</span>：<span
+class="math display">\[\begin{align}Z_{diff} &amp;= V_{diffoch} -
+V_{diffocl} \\Z_{diffsc} &amp;= V_{diffsch} - V_{diffscl} \\Z_{diff}
+&amp;= \sqrt{Z_{diffoc} \times  Z_{diffsc}} \\Z_{odd} &amp;= Z_{diff}
+\div 2 \\\end{align}\]</span></li>
+</ol></li>
+<li>计算偶模阻抗：
+<ol type="1">
+<li>使用偶模方式连接 AC 源对 CLIN 进行开路激励，使用 label 获得 AC
+源的输出电压为 <span class="math inline">\(V_{cmoc}\)</span> ；</li>
+<li>使用偶模方式连接 AC 源对 CLIN 进行短路激励，CLIN 的另一端接地，使用
+label 获得 AC 源的输出电压为 <span
+class="math inline">\(V_{cmsc}\)</span> ；</li>
+<li>即可得到 <span class="math inline">\(Z_{even}\)</span>：<span
+class="math display">\[\begin{align}Z_{cm} &amp;= \sqrt{V_{cmoc} \times
+V_{cmsc}} \\Z_{even} &amp;= Z_{cm} \times 2 \\\end{align}\]</span></li>
+</ol></li>
+</ol></li>
+<li>验证：
+<ol type="1">
+<li>使用 ADS 自带的理想 CLIN
+模型，将上一步得到的奇模阻抗、偶模阻抗以及电长度带入，计算 S
+参数，可以看到两种方式的结果非常接近。</li>
+</ol></li>
 </ol>
 <blockquote>
-<p>[!NOTE]<br>    ADS 自带的 CLIN 模型在处理电长度的时候有些疑问，设置的电长度只有为 90 的整数倍时，仿真的结果才能与设置的一致，其余状态下都会略有区别。因此在验证中，首先先调整理想 CLIN 模型的电长度，使其仿真结果与所需的电长度一致，再与 layout 的仿真结果进行对比。</p>
+<p>ADS 自带的 CLIN 模型在处理电长度的时候有些疑问，设置的电长度只有为 90
+的整数倍时，仿真的结果才能与设置的一致，其余状态下都会略有区别。因此在验证中，首先先调整理想
+CLIN 模型的电长度，使其仿真结果与所需的电长度一致，再与 layout
+的仿真结果进行对比。</p>
 </blockquote>
 
     </div>
@@ -359,7 +409,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://leonfox28.github.io/2024/12/13/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/" title="">https://leonfox28.github.io/2024/12/13/计算 CLIN 的奇模阻抗和偶模阻抗/</a>
+      <a href="https://leonfox28.github.io/2024/12/12/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/" title="计算 CLIN 的奇模阻抗和偶模阻抗">https://leonfox28.github.io/2024/12/12/计算 CLIN 的奇模阻抗和偶模阻抗/</a>
   </li>
   <li class="post-copyright-license">
       <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-ND</a> 许可协议。转载请注明出处！
@@ -445,6 +495,12 @@
   
 
 
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
 
 
 

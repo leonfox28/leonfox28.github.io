@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>EDA环境搭建（一）：安装VMware vSphere 8.0</title>
-    <url>/2024/11/26/EDA%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%AE%89%E8%A3%85%20VMware%20vSphere%208.0/</url>
+    <title>计算 CLIN 的奇模阻抗和偶模阻抗</title>
+    <url>/2024/12/12/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/</url>
     <content><![CDATA[<blockquote>
-<p>使用 VMware vSphere 8.0 对服务器进行虚拟化</p>
+<p>介绍如何计算 CLIN 的奇模和偶模阻抗</p>
 </blockquote>
 <span id="more"></span>
-<h1 id="更新历史"><a href="#更新历史" class="headerlink" title="更新历史"></a>更新历史</h1><table>
+<h1 id="changelog">Changelog</h1>
+<table>
 <thead>
 <tr>
 <th>Revision</th>
@@ -16,25 +17,174 @@
 <th>Date</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
+<td>1</td>
+<td>Initial release.</td>
+<td>Leon</td>
+<td>2024-12-12</td>
+</tr>
+</tbody>
+</table>
+<h1 id="目的">目的</h1>
+<ul>
+<li>原理图设计阶段，为了设计方便，常使用带奇模/偶模阻抗及电长度的理想
+CLIN 模型进行设计；</li>
+<li>但在 layout 阶段，我们很难直观的看到一对 CLIN
+的奇模/偶模阻抗，需要根据仿真结果进行计算；</li>
+<li>本文即介绍如何计算一对 CLIN 的奇模阻抗和偶模阻抗。</li>
+</ul>
+<h1 id="基本概念">基本概念</h1>
+<ol type="1">
+<li>奇模、奇模阻抗与差分阻抗
+<ul>
+<li>奇模（Odd Mode）:
+当差分线对上的两个信号幅度相等、相位相反时，我们称之为奇模。例如，一条线上的电压为+V，另一条线上的电压为-V。奇模信号主要对应差分信号；</li>
+<li>奇模阻抗（Odd-Mode Impedence, <span
+class="math inline">\(Z_{odd}\)</span>）是指当差分线对以奇模方式激励时，单根传输线的特性阻抗。换句话说，它是差分信号在单根线上看到的阻抗。
+<ul>
+<li>对于紧密耦合的差分线对，==奇模阻抗会比单根传输线的特性阻抗低==。这是因为两条线之间的耦合导致了电容的增加。</li>
+</ul></li>
+<li>差分阻抗（<span
+class="math inline">\(Z_{diff}\)</span>）是差分信号在差分线对上传输时所看到的阻抗。在理想情况下，差分阻抗是奇模阻抗的两倍：<span
+class="math inline">\(Z_{diff} = 2 \times Z_{odd}\)</span>；</li>
+</ul></li>
+<li>偶模、偶模阻抗与共模阻抗
+<ul>
+<li>偶模（Even Mode）:
+当差分线对上的两个信号幅度相等、相位相同时，我们称之为偶模。例如，两条线上的电压都为+V。偶模信号主要对应共模信号；</li>
+<li>偶模阻抗（Even-Mode Impedance, <span
+class="math inline">\(Z_{even}\)</span>）是指当差分线对以偶模方式激励时，单根传输线的特性阻抗。换句话说，它是共模信号在单根线上看到的阻抗；
+<ul>
+<li>对于紧密耦合的差分线对，==偶模阻抗会比单根传输线的特性阻抗高==。这是因为两条线之间的耦合导致了电感的增加。</li>
+</ul></li>
+<li>共模阻抗（<span
+class="math inline">\(Z_{common}\)</span>）是共模信号在差分线对上传输时所看到的阻抗。在理想情况下，共模阻抗是偶模阻抗的一半：<span
+class="math inline">\(Z_{common} = Z_{even} \div 2\)</span></li>
+</ul></li>
+</ol>
+<h1 id="计算一对-clin-的奇模阻抗和偶模阻抗">计算一对 CLIN
+的奇模阻抗和偶模阻抗</h1>
+<ol type="1">
+<li>画出一对 CLIN：
+<ol type="1">
+<li>使用如下叠层结构：
+<ul>
+<li>10L 板；</li>
+<li>铜厚 15um，从上到下为 M1~M10；</li>
+<li>介质层为 GEA-705G，介电常数为 3.7，厚度为 25um；</li>
+</ul></li>
+<li>CLIN：
+<ul>
+<li>位于 M1，边缘耦合，线宽 40um，线距 20um，长度 1500um；</li>
+</ul></li>
+</ol></li>
+<li>使用 Mom RF 进行仿真并生成模型；</li>
+<li>在 schematic 中导入模型，使用 AC (<em>I_AC</em>) 源进行激励，波形为
+<span class="math inline">\(I_{ac} = polar(1,0) A\)</span>，频率参数化为
+<span class="math inline">\(freq\)</span>，并添加 AC 仿真器：
+<ol type="1">
+<li>计算奇模阻抗：
+<ol type="1">
+<li>使用奇模方式连接 AC 源对 CLIN 进行开路激励，使用 label 获得 AC
+源正负极电压为 <span class="math inline">\(V_{diffoch}\)</span> 与 <span
+class="math inline">\(V_{diffocl}\)</span>；</li>
+<li>使用奇模方式连接 AC 源对 CLIN 进行短路激励，使用 label 获得 AC
+源正负极电压为 <span class="math inline">\(V_{diffsch}\)</span> 与 <span
+class="math inline">\(V_{diffscl}\)</span>；</li>
+<li>即可得到 <span class="math inline">\(Z_{odd}\)</span>：<span
+class="math display">\[\begin{align}Z_{diff} &amp;= V_{diffoch} -
+V_{diffocl} \\Z_{diffsc} &amp;= V_{diffsch} - V_{diffscl} \\Z_{diff}
+&amp;= \sqrt{Z_{diffoc} \times  Z_{diffsc}} \\Z_{odd} &amp;= Z_{diff}
+\div 2 \\\end{align}\]</span></li>
+</ol></li>
+<li>计算偶模阻抗：
+<ol type="1">
+<li>使用偶模方式连接 AC 源对 CLIN 进行开路激励，使用 label 获得 AC
+源的输出电压为 <span class="math inline">\(V_{cmoc}\)</span> ；</li>
+<li>使用偶模方式连接 AC 源对 CLIN 进行短路激励，CLIN 的另一端接地，使用
+label 获得 AC 源的输出电压为 <span
+class="math inline">\(V_{cmsc}\)</span> ；</li>
+<li>即可得到 <span class="math inline">\(Z_{even}\)</span>：<span
+class="math display">\[\begin{align}Z_{cm} &amp;= \sqrt{V_{cmoc} \times
+V_{cmsc}} \\Z_{even} &amp;= Z_{cm} \times 2 \\\end{align}\]</span></li>
+</ol></li>
+</ol></li>
+<li>验证：
+<ol type="1">
+<li>使用 ADS 自带的理想 CLIN
+模型，将上一步得到的奇模阻抗、偶模阻抗以及电长度带入，计算 S
+参数，可以看到两种方式的结果非常接近。</li>
+</ol></li>
+</ol>
+<blockquote>
+<p>ADS 自带的 CLIN 模型在处理电长度的时候有些疑问，设置的电长度只有为 90
+的整数倍时，仿真的结果才能与设置的一致，其余状态下都会略有区别。因此在验证中，首先先调整理想
+CLIN 模型的电长度，使其仿真结果与所需的电长度一致，再与 layout
+的仿真结果进行对比。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>电路设计</category>
+      </categories>
+      <tags>
+        <tag>ads</tag>
+        <tag>design</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>EDA环境搭建（一）：安装VMware vSphere 8.0</title>
+    <url>/2024/11/26/EDA%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88%E4%B8%80%EF%BC%89%EF%BC%9A%E5%AE%89%E8%A3%85%20VMware%20vSphere%208.0/</url>
+    <content><![CDATA[<blockquote>
+<p>使用 VMware vSphere 8.0 对服务器进行虚拟化</p>
+</blockquote>
+<span id="more"></span>
+<h1 id="changelog">Changelog</h1>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 15%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr>
+<th>Revision</th>
+<th>Description</th>
+<th>Author</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td>1</td>
 <td>Initial release.</td>
 <td>Leon</td>
 <td>2024-11-26</td>
 </tr>
-</tbody></table>
-<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><ul>
+</tbody>
+</table>
+<h1 id="简介">简介</h1>
+<ul>
 <li>首先对基础服务器进行虚拟化。虚拟化平台采用 VMware vSphere 8；</li>
-<li>虚拟机硬件配置为：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：</span><br><span class="line">CPU：</span><br><span class="line">内存：</span><br><span class="line">硬盘：</span><br><span class="line">显卡：</span><br><span class="line">网卡：</span><br></pre></td></tr></table></figure></li>
+<li>虚拟机硬件配置为： <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：</span><br><span class="line">CPU：</span><br><span class="line">内存：</span><br><span class="line">硬盘：</span><br><span class="line">显卡：</span><br><span class="line">网卡：</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h1 id="1-安装-ESXi"><a href="#1-安装-ESXi" class="headerlink" title="1 安装 ESXi"></a>1 安装 ESXi</h1><h2 id="1-1-获取系统镜像"><a href="#1-1-获取系统镜像" class="headerlink" title="1.1 获取系统镜像"></a>1.1 获取系统镜像</h2><ul>
+<h1 id="安装-esxi">1 安装 ESXi</h1>
+<h2 id="获取系统镜像">1.1 获取系统镜像</h2>
+<ul>
 <li>ESXi 镜像获取自行上网搜索。</li>
-<li>系统文件为 <code>VMware-VMvisor-Installer-version_number-build_number.x86_64.iso</code>；</li>
+<li>系统文件为
+<code>VMware-VMvisor-Installer-version_number-build_number.x86_64.iso</code>；</li>
 </ul>
-<h2 id="1-2-制作引导-U-盘"><a href="#1-2-制作引导-U-盘" class="headerlink" title="1.2 制作引导 U 盘"></a>1.2 制作引导 U 盘</h2><ul>
+<h2 id="制作引导-u-盘">1.2 制作引导 U 盘</h2>
+<ul>
 <li>使用 rufus 刻录 iso 文件；</li>
 </ul>
-<h2 id="1-3-启动服务器并使用-U-盘引导启动"><a href="#1-3-启动服务器并使用-U-盘引导启动" class="headerlink" title="1.3 启动服务器并使用 U 盘引导启动"></a>1.3 启动服务器并使用 U 盘引导启动</h2><h2 id="1-4-安装-ESXi"><a href="#1-4-安装-ESXi" class="headerlink" title="1.4 安装 ESXi"></a>1.4 安装 ESXi</h2><h2 id="1-5-设置-ESXi"><a href="#1-5-设置-ESXi" class="headerlink" title="1.5 设置 ESXi"></a>1.5 设置 ESXi</h2>]]></content>
+<h2 id="启动服务器并使用-u-盘引导启动">1.3 启动服务器并使用 U
+盘引导启动</h2>
+<h2 id="安装-esxi-1">1.4 安装 ESXi</h2>
+<h2 id="设置-esxi">1.5 设置 ESXi</h2>
+]]></content>
       <categories>
         <category>EDA环境搭建</category>
       </categories>
@@ -44,64 +194,20 @@
       </tags>
   </entry>
   <entry>
-    <title>EDA环境搭建（零）：架构与硬件选型</title>
-    <url>/2024/11/26/EDA%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88%E9%9B%B6%EF%BC%89%EF%BC%9A%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A1%AC%E4%BB%B6%E9%80%89%E5%9E%8B/</url>
-    <content><![CDATA[<blockquote>
-<p>公司要新建一套 EDA 环境，要满足易用、安全的原则。</p>
-</blockquote>
-<span id="more"></span>
-<h1 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h1><table>
-<thead>
-<tr>
-<th>Revision</th>
-<th>Description</th>
-<th>Author</th>
-<th>Date</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>Initial release.</td>
-<td>Leon</td>
-<td>2024-11-26</td>
-</tr>
-</tbody></table>
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><ul>
-<li>公司目前的 EDA 环境为很多人登录在一台 Windows Server 上，数据也存在本地，虽然是 RAID 1 的配置，但依然不放心。另外这种方式不方便进行计算资源的管理，且项目中的多人合作也因没有版本控制而饱受诟病。</li>
-<li>因此计划更新整套 EDA 环境，期望解决以上问题。</li>
-</ul>
-<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><ul>
-<li>大致架构如下：<br>  <img src="https://s2.loli.net/2024/11/27/gd4oribI7QFhGNW.png" alt="image.png"></li>
-</ul>
-<h1 id="软件"><a href="#软件" class="headerlink" title="软件"></a>软件</h1><ul>
-<li>主要使用到的软件有：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">虚拟化：VMware vSphere ESXi 8.0u3b</span><br><span class="line">集群管理：VMware vCenter Server 8.0.3</span><br><span class="line">VDI：VMware Horizon 8 2312.1</span><br><span class="line">Linux 虚拟机：RHEL 8.8</span><br><span class="line">Windows 虚拟机：Windows 10 LTSC</span><br><span class="line">计算服务器：RHEL 8.8</span><br><span class="line">ADS: ADS 2024 U2.2</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h1 id="硬件"><a href="#硬件" class="headerlink" title="硬件"></a>硬件</h1><h2 id="虚拟化服务器"><a href="#虚拟化服务器" class="headerlink" title="虚拟化服务器"></a>虚拟化服务器</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R283-ZK0</span><br><span class="line">CPU：EPYC 9554 x2</span><br><span class="line">内存：三星64G DDR5 4800 x8</span><br><span class="line">硬盘：SN640 7.68T x2</span><br><span class="line">显卡：Tesla T4 x2</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
-
-<h2 id="计算服务器"><a href="#计算服务器" class="headerlink" title="计算服务器"></a>计算服务器</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R283-ZK0</span><br><span class="line">CPU：EPYC 9554 x2</span><br><span class="line">内存：三星64G DDR5 4800 x16</span><br><span class="line">硬盘：SN640 7.68T x2</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
-
-<h2 id="L1-存储服务器"><a href="#L1-存储服务器" class="headerlink" title="L1 存储服务器"></a>L1 存储服务器</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R272-Z34</span><br><span class="line">CPU：EPYC 7543</span><br><span class="line">内存：三星64G DDR4 3200 x4</span><br><span class="line">硬盘：SN640 7.68T x8</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
-
-<h2 id="L2-存储服务器"><a href="#L2-存储服务器" class="headerlink" title="L2 存储服务器"></a>L2 存储服务器</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R272-Z34</span><br><span class="line">CPU：EPYC 7543</span><br><span class="line">内存：三星64G DDR4 3200 x4</span><br><span class="line">硬盘：希捷 16T x12</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
-
-<h2 id="Firewall"><a href="#Firewall" class="headerlink" title="Firewall"></a>Firewall</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">飞塔 FG-90G</span><br></pre></td></tr></table></figure>
-
-<h2 id="Switch"><a href="#Switch" class="headerlink" title="Switch"></a>Switch</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Mikrotik CRS510-8XS-2XQ-IN</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>EDA环境搭建</category>
-      </categories>
-      <tags>
-        <tag>eda</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>常用链接</title>
     <url>/2024/11/27/%E5%B8%B8%E7%94%A8%E9%93%BE%E6%8E%A5/</url>
     <content><![CDATA[<blockquote>
 <p>一些常用链接</p>
 </blockquote>
 <span id="more"></span>
-<h1 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h1><table>
+<h1 id="changelog">Changelog</h1>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 15%" />
+<col style="width: 47%" />
+</colgroup>
 <thead>
 <tr>
 <th>Revision</th>
@@ -110,29 +216,41 @@
 <th>Date</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>1</td>
 <td>Initial release.</td>
 <td>Leon</td>
 <td>2024-11-27</td>
 </tr>
-</tbody></table>
-<h1 id="Keysight"><a href="#Keysight" class="headerlink" title="Keysight"></a>Keysight</h1><ul>
-<li><a href="https://www.keysight.com.cn/cn/zh/lib/software-detail/computer-software/pathwave-advanced-design-system-ads-software-2212036.html">Advanced Design System (ADS)</a></li>
-<li><a href="https://www.keysight.com/us/en/lib/resources/technical-specifications/latest-versions-signal-studio-software-2806906.html">Signal Studio Software</a></li>
+</tbody>
+</table>
+<h1 id="keysight">Keysight</h1>
+<ul>
+<li><a
+href="https://www.keysight.com.cn/cn/zh/lib/software-detail/computer-software/pathwave-advanced-design-system-ads-software-2212036.html">Advanced
+Design System (ADS)</a></li>
+<li><a
+href="https://www.keysight.com/us/en/lib/resources/technical-specifications/latest-versions-signal-studio-software-2806906.html">Signal
+Studio Software</a></li>
 </ul>
-<h1 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h1><ul>
-<li><a href="https://massgrave.dev/">Microsoft Activation Scripts (MAS)</a></li>
-<li><a href="https://wind4.github.io/vlmcsd/">Microsoft KMS Activation</a></li>
-<li><a href="https://files.rg-adguard.net/search">List of files by Microsoft®</a></li>
+<h1 id="windows">Windows</h1>
+<ul>
+<li><a href="https://massgrave.dev/">Microsoft Activation Scripts
+(MAS)</a></li>
+<li><a href="https://wind4.github.io/vlmcsd/">Microsoft KMS
+Activation</a></li>
+<li><a href="https://files.rg-adguard.net/search">List of files by
+Microsoft®</a></li>
 </ul>
-<h1 id="VMware"><a href="#VMware" class="headerlink" title="VMware"></a>VMware</h1><ul>
+<h1 id="vmware">VMware</h1>
+<ul>
 <li><a href="https://www.dinghui.org/">丁辉博客</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>eda</tag>
         <tag>ads</tag>
+        <tag>eda</tag>
         <tag>cadence</tag>
         <tag>virtuoso</tag>
         <tag>windows</tag>
@@ -140,9 +258,14 @@
       </tags>
   </entry>
   <entry>
-    <title></title>
-    <url>/2024/12/13/%E8%AE%A1%E7%AE%97%20CLIN%20%E7%9A%84%E5%A5%87%E6%A8%A1%E9%98%BB%E6%8A%97%E5%92%8C%E5%81%B6%E6%A8%A1%E9%98%BB%E6%8A%97/</url>
-    <content><![CDATA[<h1 id="Changelog"><a href="#Changelog" class="headerlink" title="Changelog"></a>Changelog</h1><table>
+    <title>EDA环境搭建（零）：架构与硬件选型</title>
+    <url>/2024/11/26/EDA%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%88%E9%9B%B6%EF%BC%89%EF%BC%9A%E6%9E%B6%E6%9E%84%E4%B8%8E%E7%A1%AC%E4%BB%B6%E9%80%89%E5%9E%8B/</url>
+    <content><![CDATA[<blockquote>
+<p>公司要新建一套 EDA 环境，要满足易用、安全的原则。</p>
+</blockquote>
+<span id="more"></span>
+<h1 id="changelog">Changelog</h1>
+<table>
 <thead>
 <tr>
 <th>Revision</th>
@@ -151,80 +274,51 @@
 <th>Date</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>1</td>
 <td>Initial release.</td>
 <td>Leon</td>
-<td>2024-12-12</td>
+<td>2024-11-26</td>
 </tr>
-</tbody></table>
-<h1 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h1><ul>
-<li>原理图设计阶段，为了设计方便，常使用带奇模&#x2F;偶模阻抗及电长度的理想 CLIN 模型进行设计；</li>
-<li>但在 layout 阶段，我们很难直观的看到一对 CLIN 的奇模&#x2F;偶模阻抗，需要根据仿真结果进行计算；</li>
-<li>本文即介绍如何计算一对 CLIN 的奇模阻抗和偶模阻抗。</li>
+</tbody>
+</table>
+<h1 id="背景">背景</h1>
+<ul>
+<li>公司目前的 EDA 环境为很多人登录在一台 Windows Server
+上，数据也存在本地，虽然是 RAID 1
+的配置，但依然不放心。另外这种方式不方便进行计算资源的管理，且项目中的多人合作也因没有版本控制而饱受诟病。</li>
+<li>因此计划更新整套 EDA 环境，期望解决以上问题。</li>
 </ul>
-<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><ol>
-<li>奇模、奇模阻抗与差分阻抗<ul>
-<li>奇模（Odd Mode）: 当差分线对上的两个信号幅度相等、相位相反时，我们称之为奇模。例如，一条线上的电压为+V，另一条线上的电压为-V。奇模信号主要对应差分信号；</li>
-<li>奇模阻抗（Odd-Mode Impedence, $Z_{odd}$）是指当差分线对以奇模方式激励时，单根传输线的特性阻抗。换句话说，它是差分信号在单根线上看到的阻抗。<ul>
-<li>对于紧密耦合的差分线对，&#x3D;&#x3D;奇模阻抗会比单根传输线的特性阻抗低&#x3D;&#x3D;。这是因为两条线之间的耦合导致了电容的增加。</li>
+<h1 id="架构">架构</h1>
+<ul>
+<li>大致架构如下： <img
+src="https://s2.loli.net/2024/11/27/gd4oribI7QFhGNW.png"
+alt="image.png" /></li>
 </ul>
-</li>
-<li>差分阻抗（$Z_{diff}$）是差分信号在差分线对上传输时所看到的阻抗。在理想情况下，差分阻抗是奇模阻抗的两倍：$Z_{diff} &#x3D; 2 \times Z_{odd}$；</li>
+<h1 id="软件">软件</h1>
+<ul>
+<li>主要使用到的软件有： <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">虚拟化：VMware vSphere ESXi 8.0u3b</span><br><span class="line">集群管理：VMware vCenter Server 8.0.3</span><br><span class="line">VDI：VMware Horizon 8 2312.1</span><br><span class="line">Linux 虚拟机：RHEL 8.8</span><br><span class="line">Windows 虚拟机：Windows 10 LTSC</span><br><span class="line">计算服务器：RHEL 8.8</span><br><span class="line">ADS: ADS 2024 U2.2</span><br></pre></td></tr></table></figure></li>
 </ul>
-</li>
-<li>偶模、偶模阻抗与共模阻抗<ul>
-<li>偶模（Even Mode）: 当差分线对上的两个信号幅度相等、相位相同时，我们称之为偶模。例如，两条线上的电压都为+V。偶模信号主要对应共模信号；</li>
-<li>偶模阻抗（Even-Mode Impedance, $Z_{even}$）是指当差分线对以偶模方式激励时，单根传输线的特性阻抗。换句话说，它是共模信号在单根线上看到的阻抗；<ul>
-<li>对于紧密耦合的差分线对，&#x3D;&#x3D;偶模阻抗会比单根传输线的特性阻抗高&#x3D;&#x3D;。这是因为两条线之间的耦合导致了电感的增加。</li>
-</ul>
-</li>
-<li>共模阻抗（$Z_{common}$）是共模信号在差分线对上传输时所看到的阻抗。在理想情况下，共模阻抗是偶模阻抗的一半：$Z_{common} &#x3D; Z_{even} \div 2$</li>
-</ul>
-</li>
-</ol>
-<h1 id="计算一对-CLIN-的奇模阻抗和偶模阻抗"><a href="#计算一对-CLIN-的奇模阻抗和偶模阻抗" class="headerlink" title="计算一对 CLIN 的奇模阻抗和偶模阻抗"></a>计算一对 CLIN 的奇模阻抗和偶模阻抗</h1><ol>
-<li>画出一对 CLIN：<ol>
-<li>使用如下叠层结构：<ul>
-<li>10L 板；</li>
-<li>铜厚 15um，从上到下为 M1~M10；</li>
-<li>介质层为 GEA-705G，介电常数为 3.7，厚度为 25um；</li>
-</ul>
-</li>
-<li>CLIN：<ul>
-<li>位于 M1，边缘耦合，线宽 40um，线距 20um，长度 1500um；</li>
-</ul>
-</li>
-</ol>
-</li>
-<li>使用 Mom RF 进行仿真并生成模型；</li>
-<li>在 schematic 中导入模型，使用 AC (<em>I_AC</em>) 源进行激励，波形为 $I_{ac} &#x3D; polar(1,0) A$，频率参数化为 $freq$，并添加 AC 仿真器：<ol>
-<li>计算奇模阻抗：<ol>
-<li>使用奇模方式连接 AC 源对 CLIN 进行开路激励，使用 label 获得 AC 源正负极电压为 $V_{diffoch}$ 与 $V_{diffocl}$；</li>
-<li>使用奇模方式连接 AC 源对 CLIN 进行短路激励，使用 label 获得 AC 源正负极电压为 $V_{diffsch}$ 与 $V_{diffscl}$；</li>
-<li>即可得到 $Z_{odd}$：$$\begin{align}Z_{diff} &amp;&#x3D; V_{diffoch} - V_{diffocl} \Z_{diffsc} &amp;&#x3D; V_{diffsch} - V_{diffscl} \Z_{diff} &amp;&#x3D; \sqrt{Z_{diffoc} \times  Z_{diffsc}} \Z_{odd} &amp;&#x3D; Z_{diff} \div 2 \\end{align}$$</li>
-</ol>
-</li>
-<li>计算偶模阻抗：<ol>
-<li>使用偶模方式连接 AC 源对 CLIN 进行开路激励，使用 label 获得 AC 源的输出电压为 $V_{cmoc}$ ；</li>
-<li>使用偶模方式连接 AC 源对 CLIN 进行短路激励，CLIN 的另一端接地，使用 label 获得 AC 源的输出电压为 $V_{cmsc}$ ；</li>
-<li>即可得到 $Z_{even}$：$$\begin{align}Z_{cm} &amp;&#x3D; \sqrt{V_{cmoc} \times V_{cmsc}} \Z_{even} &amp;&#x3D; Z_{cm} \times 2 \\end{align}$$</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>验证：<ol>
-<li>使用 ADS 自带的理想 CLIN 模型，将上一步得到的奇模阻抗、偶模阻抗以及电长度带入，计算 S 参数，可以看到两种方式的结果非常接近。</li>
-</ol>
-</li>
-</ol>
-<blockquote>
-<p>[!NOTE]<br>    ADS 自带的 CLIN 模型在处理电长度的时候有些疑问，设置的电长度只有为 90 的整数倍时，仿真的结果才能与设置的一致，其余状态下都会略有区别。因此在验证中，首先先调整理想 CLIN 模型的电长度，使其仿真结果与所需的电长度一致，再与 layout 的仿真结果进行对比。</p>
-</blockquote>
+<h1 id="硬件">硬件</h1>
+<h2 id="虚拟化服务器">虚拟化服务器</h2>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R283-ZK0</span><br><span class="line">CPU：EPYC 9554 x2</span><br><span class="line">内存：三星64G DDR5 4800 x8</span><br><span class="line">硬盘：SN640 7.68T x2</span><br><span class="line">显卡：Tesla T4 x2</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
+<h2 id="计算服务器">计算服务器</h2>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R283-ZK0</span><br><span class="line">CPU：EPYC 9554 x2</span><br><span class="line">内存：三星64G DDR5 4800 x16</span><br><span class="line">硬盘：SN640 7.68T x2</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
+<h2 id="l1-存储服务器">L1 存储服务器</h2>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R272-Z34</span><br><span class="line">CPU：EPYC 7543</span><br><span class="line">内存：三星64G DDR4 3200 x4</span><br><span class="line">硬盘：SN640 7.68T x8</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
+<h2 id="l2-存储服务器">L2 存储服务器</h2>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">机箱：R272-Z34</span><br><span class="line">CPU：EPYC 7543</span><br><span class="line">内存：三星64G DDR4 3200 x4</span><br><span class="line">硬盘：希捷 16T x12</span><br><span class="line">显卡：</span><br><span class="line">网卡：25G dual port</span><br></pre></td></tr></table></figure>
+<h2 id="firewall">Firewall</h2>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">飞塔 FG-90G</span><br></pre></td></tr></table></figure>
+<h2 id="switch">Switch</h2>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Mikrotik CRS510-8XS-2XQ-IN</span><br></pre></td></tr></table></figure>
 ]]></content>
+      <categories>
+        <category>EDA环境搭建</category>
+      </categories>
       <tags>
-        <tag>ads</tag>
-        <tag>design</tag>
+        <tag>eda</tag>
       </tags>
   </entry>
 </search>
